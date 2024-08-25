@@ -4,18 +4,9 @@
 from collections import deque
 import re
 def tokenize(s):
-    #return re.findall("/?[a-zA-Z()][a-zA-Z0-9_()]*|[-]?[0-9]+|[}{]+|%.*|[^ \t\n]", s) # the provided didn't work for back to back '}}'
     return re.findall("/?[a-zA-Z()][a-zA-Z0-9_()]*|[-]?[0-9]+|}|{|%.*|[^ \t\n]", s)
 
-#------------------------- 10% -------------------------------------
-# The operand stack: define the operand stack and its operations
 opstack = []  #assuming top of the stack is the end of the list
-
-# Now define the helper functions to push and pop values on the opstack
-# (i.e, add/remove elements to/from the end of the Python list)
-# Remember that there is a Postscript operator called "pop" so we choose
-# different names for these functions.
-# Recall that `pass` in python is a no-op: replace it with your code.
 
 def opPop():
     # opPop should return the popped value.
@@ -161,8 +152,6 @@ def opPush(value):
     else: # we found a variable, append the value to the stack
         opstack.append(n)
 
-#-------------------------- 20% -------------------------------------
-# The dictionary stack: define the dictionary stack and its operations
 dictstack = []  #assuming top of the stack is the end of the list
 
 # now define functions to push and pop dictionaries on the dictstack, to
@@ -175,10 +164,6 @@ def dictPop():
     return dictstack.pop();
 
 def dictPush(d):
-    #dictPush pushes the dictionary ‘d’ to the dictstack.
-    #Note that, your interpreter will call dictPush only when Postscript
-    #“begin” operator is called. “begin” should pop the empty dictionary from
-    #the opstack and push it onto the dictstack by calling dictPush.
     if d == None:
         return
     dictstack.append(d);
@@ -227,10 +212,6 @@ def lookup(name):
         x = x[1:]
     return x
 
-#--------------------------- 10% -------------------------------------
-# Arithmetic and comparison operators: add, sub, mul, div, mod, eq, lt, gt
-# Make sure to check the operand stack has the correct number of parameters
-# and types of the parameters are correct.
 def add():
     y = opPop()
     x = opPop()
@@ -345,8 +326,6 @@ def ge():
         opPush(y)
         print('ge: invalid stack operands')
 
-#--------------------------- 15% -------------------------------------
-# String operators: define the string operators length, get, getinterval, put
 def length():
     s = opPop()
     if isinstance(s, str): # only push if s is a string
@@ -443,8 +422,6 @@ def put():
                 if id(dictstack[i][it]) == id(org):
                     dictstack[i][it] = s
 
-#--------------------------- 25% -------------------------------------
-# Define the stack manipulation and print operators: dup, copy, pop, clear, exch, roll, stack
 def dup():
     x = opPop()
     opPush(x)
@@ -549,12 +526,6 @@ def printHelper(item):
     else:
         return str(item) + ' '
 
-#--------------------------- 20% -------------------------------------
-# Define the dictionary manipulation operators: psDict, begin, end, psDef
-# name the function for the def operator psDef because def is reserved in Python. Similarly, call the function for dict operator as psDict.
-# Note: The psDef operator will pop the value and name from the opstack and call your own "define" operator (pass those values as parameters).
-# Note that psDef()won't have any parameters.
-
 def psDict():
     # step 1: pop an integer off the stack
     x = opPop()
@@ -589,10 +560,6 @@ def psDef():
         print('def: invalid stack operands')
     else: # call define
         define(name, value)
-        
-        
-        
-# --Start of HW5 material-- #
 
 def psIf():
     codeArr = opPop()
@@ -650,11 +617,6 @@ def psFor():
                     opPush(it) # recursive statement: psFor was called by opPush
                 init += incr
   
-# complete this function
-# The it argument is an iterator.
-# The sequence of return characters should represent a list of properly nested
-# tokens, where the tokens between '{' and '}' is included as a sublist. If the
-# parenteses in the input iterator is not properly nested, returns False.
 def groupMatching2(it):
     res = []
     for c in it:
@@ -684,11 +646,6 @@ def groupMatchingArray(it):
         if c == ']':
             return res
         elif c =='[':
-            # Note how we use a recursive call to group the tokens inside the
-            # inner matching parenthesis.
-            # Once the recursive call returns the code array for the inner
-            # paranthesis, it will be appended to the list we are constructing
-            # as a whole.
             res.append(groupMatchingArray(it))
         else:
             try:
@@ -701,10 +658,6 @@ def groupMatchingArray(it):
             res.append(c)
     return False
 
-
-# Complete this function
-# Function to parse a list of tokens and arrange the tokens between { and } braces
-# as code-arrays.
 # Properly nested parentheses are arranged into a list of properly nested lists.
 def parse(L):
     res = []
@@ -731,10 +684,6 @@ def parse(L):
             res.append(c)
     return res    
 
-# Write the necessary code here; again write
-# auxiliary functions if you need them. This will probably be the largest
-# function of the whole project, but it will have a very regular and obvious
-# structure if you've followed the plan of the assignment.
 def interpretSPS(code): # code is a code array ex [1, 1, add]
     for it in code:
         val = lookup(it)
@@ -751,7 +700,6 @@ def interpretSPS(code): # code is a code array ex [1, 1, add]
         else:
             opPush(it)
 
-# Copy this to your HW5.py file>
 def interpreter(s): # s is a string
     n = parse(tokenize(s))
     if n == False:
